@@ -73,10 +73,10 @@ Hydrogen-Energy-ML-Project/
 - **Optimal Conditions:** ~60–80 °C, 800–2000 mA/cm² → Efficiency up to ~94.7%  
 
 ## 🚀 How to Run
-**1. Clone the repository:**
+**1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/Hydrogen-Energy-ML-Project.git
-cd Hydrogen-Energy-ML-Project
+   git clone https://github.com/Yuvibarot/GreenFuel-ML.git
+   cd GreenFuel-ML
 ```
 **2. Install dependencies:**
 ```bash
