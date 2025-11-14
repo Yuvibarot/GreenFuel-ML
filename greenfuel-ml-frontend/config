@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[user]
+	name = GreenFuel-Deploy
+	email = greenfuel@noreply.github.com
+[remote "origin"]
+	url = https://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@github.com/Yuvibarot/GreenFuel-ML.git
+	fetch = +refs/heads/*:refs/remotes/origin/*

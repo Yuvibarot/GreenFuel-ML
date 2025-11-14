@@ -1,0 +1,143 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: GreenFuel-ML Hydrogen Production Prediction API
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 512
+    Runtime: python3.9
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref PredictionsTable
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+    Description: Environment name
+
+Resources:
+  # Lambda Functions
+  PredictFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'greenfuel-predict-${Environment}'
+      CodeUri: .
+      Handler: app.predict
+      Events:
+        PredictAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /predict
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PredictionsTable
+      Layers:
+        - !Ref DependenciesLayer
+
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'greenfuel-health-${Environment}'
+      CodeUri: .
+      Handler: app.health
+      Events:
+        HealthAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /health
+            Method: get
+
+  ModelInfoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'greenfuel-modelinfo-${Environment}'
+      CodeUri: .
+      Handler: app.model_info
+      Events:
+        ModelInfoAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref API
+            Path: /model-info
+            Method: get
+
+  # API Gateway
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub 'greenfuel-api-${Environment}'
+      StageName: !Ref Environment
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+
+  # Lambda Layer for Dependencies
+  DependenciesLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      LayerName: !Sub 'greenfuel-dependencies-${Environment}'
+      Description: Python dependencies for GreenFuel-ML
+      Content:
+        S3Bucket: !Ref DependenciesBucket
+        S3Key: layer.zip
+      CompatibleRuntimes:
+        - python3.9
+
+  # S3 Bucket for dependencies
+  DependenciesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'greenfuel-dependencies-${Environment}-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+
+  # DynamoDB Table for predictions history
+  PredictionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'greenfuel-predictions-${Environment}'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PredictionID
+          AttributeType: S
+        - AttributeName: Timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PredictionID
+          KeyType: HASH
+        - AttributeName: Timestamp
+          KeyType: RANGE
+      TTL:
+        AttributeName: ExpirationTime
+        Enabled: true
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+
+  # CloudWatch Log Group
+  APILogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/greenfuel-${Environment}'
+      RetentionInDays: 14
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${API}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+    Export:
+      Name: !Sub 'greenfuel-api-endpoint-${Environment}'
+
+  PredictionsTableName:
+    Description: DynamoDB table for predictions
+    Value: !Ref PredictionsTable
+    Export:
+      Name: !Sub 'greenfuel-table-${Environment}'

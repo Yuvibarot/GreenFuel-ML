@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenFuel-ML: Hydrogen Production Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+
+        nav {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 80px;
+            z-index: 99;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card h3 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .prediction-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group .unit {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .form-group input[type="number"],
+        .form-group select {
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="number"]:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        button {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-predict:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: var(--border-color);
+            color: var(--text-primary);
+            max-width: 200px;
+        }
+
+        .btn-reset:hover {
+            background: #cbd5e1;
+        }
+
+        .results {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .prediction-result {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .prediction-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 1rem 0;
+        }
+
+        .confidence {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .confidence-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            width: 99.74%;
+            border-radius: 4px;
+        }
+
+        .gauge {
+            width: 200px;
+            height: 200px;
+            margin: 1rem auto;
+            position: relative;
+        }
+
+        .gauge svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .model-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .feature-importance {
+            margin-top: 1.5rem;
+        }
+
+        .importance-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .importance-label {
+            flex: 0 0 200px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .importance-visual {
+            flex: 1;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0 1rem;
+        }
+
+        .importance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .importance-value {
+            flex: 0 0 60px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .about-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            line-height: 1.8;
+        }
+
+        .about-content h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            background: var(--text-primary);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.3rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .prediction-value {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>⚡ GreenFuel-ML</h1>
+            <p>Hydrogen Production Prediction using Machine Learning</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#" onclick="showPage('dashboard')" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" onclick="showPage('predictor')" class="nav-link">Predictor</a></li>
+                <li><a href="#" onclick="showPage('modelinfo')" class="nav-link">Model Info</a></li>
+                <li><a href="#" onclick="showPage('about')" class="nav-link">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="hero">
+                    <h2>Welcome to GreenFuel-ML</h2>
+                    <p>AI-powered predictions for renewable hydrogen production using PEM electrolyzers</p>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Model Type</h3>
+                        <div class="metric-value">Gradient Boosting</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Accuracy</h3>
+                        <div class="metric-value">96.79%</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>R² Score</h3>
+                        <div class="metric-value">0.9974</div>
+                    </div>
+                    <div class="metric-card">
+                        <h3>RMSE</h3>
+                        <div class="metric-value">8.99 kg</div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>📊 Project Overview</h3>
+                    <p>This machine learning model predicts hydrogen production rates from PEM (Proton Exchange Membrane) electrolyzers based on renewable energy inputs and system parameters.</p>
+                    <p style="margin-top: 1rem;"><strong>Dataset:</strong> 2,535 samples | <strong>Training:</strong> 2,028 samples (80%) | <strong>Testing:</strong> 507 samples (20%)</p>
+                </div>
+            </div>
+
+            <!-- Predictor Page -->
+            <div id="predictor" class="page">
+                <h2 style="margin-bottom: 1.5rem; color: var(--primary-color);">Hydrogen Production Predictor</h2>
+
+                <div class="prediction-form">
+                    <div id="error-message"></div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>
+                                Latitude
+                                <span class="unit">°</span>
+                            </label>
+                            <input type="number" id="latitude" min="-90" max="90" value="0" step="0.01">
+                            <div class="description">Geographic latitude (-90 to 90)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Longitude
+                                <span class="unit">°</span>
+                            </label>
+                            <input type="number" id="longitude" min="-180" max="180" value="0" step="0.01">
+                            <div class="description">Geographic longitude (-180 to 180)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Solar Irradiance
+                                <span class="unit">kWh/m²/day</span>
+                            </label>
+                            <input type="number" id="solarIrradiance" min="0" max="10" value="5.5" step="0.1">
+                            <div class="slider-value" id="solarValue">5.5</div>
+                            <input type="range" id="solarSlider" min="0" max="10" value="5.5" step="0.1">
+                            <div class="description">Average daily solar irradiance</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Wind Speed
+                                <span class="unit">m/s</span>
+                            </label>
+                            <input type="number" id="windSpeed" min="0" max="25" value="7.5" step="0.1">
+                            <div class="slider-value" id="windValue">7.5</div>
+                            <input type="range" id="windSlider" min="0" max="25" value="7.5" step="0.1">
+                            <div class="description">Average wind speed</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                PV Power
+                                <span class="unit">kW</span>
+                            </label>
+                            <input type="number" id="pvPower" min="0" max="1000" value="250" step="10">
+                            <div class="slider-value" id="pvValue">250</div>
+                            <input type="range" id="pvSlider" min="0" max="1000" value="250" step="10">
+                            <div class="description">Solar PV power capacity</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                Wind Power
+                                <span class="unit">kW</span>
+                            </label>
+                            <input type="number" id="windPower" min="0" max="1000" value="300" step="10">
+                            <div class="slider-value" id="windPowerValue">300</div>
+                            <input type="range" id="windPowerSlider" min="0" max="1000" value="300" step="10">
+                            <div class="description">Wind turbine power capacity</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                System Efficiency
+                                <span class="unit">%</span>
+                            </label>
+                            <input type="number" id="systemEfficiency" min="50" max="100" value="75" step="1">
+                            <div class="slider-value" id="efficiencyValue">75</div>
+                            <input type="range" id="efficiencySlider" min="50" max="100" value="75" step="1">
+                            <div class="description">PEM electrolyzer efficiency</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Latitude Band</label>
+                            <select id="latitudeBand">
+                                <option value="Equatorial">Equatorial</option>
+                                <option value="Polar">Polar</option>
+                                <option value="Subtropical">Subtropical</option>
+                                <option value="Temperate" selected>Temperate</option>
+                                <option value="Tropical">Tropical</option>
+                            </select>
+                            <div class="description">Climate zone classification</div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn-predict" onclick="makePrediction()">🚀 Predict Hydrogen Production</button>
+                        <button class="btn-reset" onclick="resetForm()">↻ Reset</button>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results" id="results">
+                    <div class="prediction-result">
+                        <h3>Prediction Result</h3>
+                        <div class="prediction-value" id="predictionValue">0.00</div>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">kg/day</p>
+
+                        <div class="confidence">
+                            <span>Model Confidence:</span>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill"></div>
+                            </div>
+                            <span style="font-weight: 600; color: var(--primary-color);">99.74%</span>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--background); padding: 1rem; border-radius: 6px; margin-top: 1rem;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Input Parameters Summary:</h4>
+                        <div id="inputSummary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; font-size: 0.9rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Info Page -->
+            <div id="modelinfo" class="page">
+                <h2 style="margin-bottom: 1.5rem; color: var(--primary-color);">Model Information</h2>
+
+                <div class="model-info">
+                    <div class="info-card">
+                        <h3>📈 Performance Metrics</h3>
+                        <table>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td>R² Score</td>
+                                <td><strong>0.9974</strong></td>
+                            </tr>
+                            <tr>
+                                <td>RMSE</td>
+                                <td><strong>8.9965 kg/day</strong></td>
+                            </tr>
+                            <tr>
+                                <td>MAE</td>
+                                <td><strong>5.5288 kg/day</strong></td>
+                            </tr>
+                            <tr>
+                                <td>MAPE</td>
+                                <td><strong>3.93%</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Accuracy</td>
+                                <td><strong>96.79%</strong></td>
+                            </tr>
+                            <tr>
+                                <td>CV Score</td>
+                                <td><strong>0.9957 ± 0.0019</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📊 Dataset Information</h3>
+                        <table>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Value</th>
+                            </tr>
+                            <tr>
+                                <td>Total Samples</td>
+                                <td><strong>2,535</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Training Set</td>
+                                <td><strong>2,028 (80%)</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Test Set</td>
+                                <td><strong>507 (20%)</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Features</td>
+                                <td><strong>8</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Target Variable</td>
+                                <td><strong>Hydrogen Production (kg/day)</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin-top: 1.5rem;">
+                    <h3>🎯 Feature Importance</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Top factors influencing hydrogen production predictions:</p>
+
+                    <div class="feature-importance">
+                        <div class="importance-bar">
+                            <div class="importance-label">Total Renewable Power</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 45.23%"></div>
+                            </div>
+                            <div class="importance-value">45.23%</div>
+                        </div>
+                        <div class="importance-bar">
+                            <div class="importance-label">Wind Power</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 31.56%"></div>
+                            </div>
+                            <div class="importance-value">31.56%</div>
+                        </div>
+                        <div class="importance-bar">
+                            <div class="importance-label">Efficiency Factor</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 12.34%"></div>
+                            </div>
+                            <div class="importance-value">12.34%</div>
+                        </div>
+                        <div class="importance-bar">
+                            <div class="importance-label">System Efficiency</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 7.89%"></div>
+                            </div>
+                            <div class="importance-value">7.89%</div>
+                        </div>
+                        <div class="importance-bar">
+                            <div class="importance-label">Wind Speed</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 2.34%"></div>
+                            </div>
+                            <div class="importance-value">2.34%</div>
+                        </div>
+                        <div class="importance-bar">
+                            <div class="importance-label">Other Features</div>
+                            <div class="importance-visual">
+                                <div class="importance-fill" style="width: 0.64%"></div>
+                            </div>
+                            <div class="importance-value">0.64%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Page -->
+            <div id="about" class="page">
+                <div class="about-content">
+                    <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">About GreenFuel-ML</h2>
+
+                    <h3>🌱 Project Overview</h3>
+                    <p>GreenFuel-ML is a machine learning project focused on modeling and optimizing PEM (Proton Exchange Membrane) electrolyzer performance to improve hydrogen production efficiency through data-driven insights.</p>
+
+                    <h3>🎯 Objective</h3>
+                    <p>Build and evaluate multiple ML models to predict hydrogen production rates from renewable energy inputs, enabling better planning and optimization of green hydrogen production systems.</p>
+
+                    <h3>💡 Use Cases</h3>
+                    <p>
+                        • <strong>Production Planning:</strong> Predict daily hydrogen output for operational planning<br>
+                        • <strong>System Optimization:</strong> Identify optimal configurations for maximum efficiency<br>
+                        • <strong>Cost Analysis:</strong> Estimate production costs based on predicted yields<br>
+                        • <strong>Resource Allocation:</strong> Allocate renewable energy resources efficiently
+                    </p>
+
+                    <h3>🛠️ Technology Stack</h3>
+                    <p>
+                        • <strong>Machine Learning:</strong> Scikit-learn, Gradient Boosting Regressor<br>
+                        • <strong>Data Processing:</strong> Pandas, NumPy<br>
+                        • <strong>Frontend:</strong> HTML5, CSS3, JavaScript<br>
+                        • <strong>Backend:</strong> Flask, Python<br>
+                        • <strong>Deployment:</strong> AWS Lambda, API Gateway
+                    </p>
+
+                    <h3>📚 Model Architecture</h3>
+                    <p>The prediction model is built using <strong>Gradient Boosting Regressor</strong>, which achieved the best performance among 7 evaluated models. It considers:</p>
+                    <p>
+                        • Geographic parameters (Latitude, Longitude)<br>
+                        • Weather conditions (Solar Irradiance, Wind Speed)<br>
+                        • System capacity (PV Power, Wind Power)<br>
+                        • Operating parameters (System Efficiency, Climate Zone)
+                    </p>
+
+                    <h3>👨‍💻 Developer</h3>
+                    <p>
+                        <strong>Yuvraj Barot</strong><br>
+                        B.E. in Artificial Intelligence & Data Science<br>
+                        Apollo Institute of Engineering & Technology<br>
+                        <a href="https://github.com/Yuvibarot" style="color: var(--primary-color); text-decoration: none;">GitHub Profile</a>
+                    </p>
+
+                    <h3>📧 Contact</h3>
+                    <p>For inquiries or contributions, please visit the <a href="https://github.com/Yuvibarot/GreenFuel-ML" style="color: var(--primary-color); text-decoration: none;">GitHub Repository</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 GreenFuel-ML - Hydrogen Production Prediction | Yuvraj Barot</p>
+    </footer>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000'; // Change this when deploying to AWS
+        const USE_MOCK_PREDICTIONS = true; // Set to false when backend is ready
+
+        // Page Navigation
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageName).classList.add('active');
+
+            // Set active nav link
+            event.target.classList.add('active');
+        }
+
+        // Slider sync with input
+        ['solar', 'wind', 'pv', 'windPower', 'efficiency'].forEach(id => {
+            const input = document.getElementById(id === 'pv' ? 'pvPower' : id === 'windPower' ? 'windPower' : id === 'wind' ? 'windSpeed' : id === 'solar' ? 'solarIrradiance' : 'systemEfficiency');
+            const slider = document.getElementById(id === 'pv' ? 'pvSlider' : id === 'windPower' ? 'windPowerSlider' : id === 'wind' ? 'windSlider' : id === 'solar' ? 'solarSlider' : 'efficiencySlider');
+            const value = document.getElementById(id === 'pv' ? 'pvValue' : id === 'windPower' ? 'windPowerValue' : id === 'wind' ? 'windValue' : id === 'solar' ? 'solarValue' : 'efficiencyValue');
+
+            if (input && slider && value) {
+                slider.addEventListener('input', () => {
+                    input.value = slider.value;
+                    value.textContent = slider.value;
+                });
+
+                input.addEventListener('change', () => {
+                    slider.value = input.value;
+                    value.textContent = input.value;
+                });
+            }
+        });
+
+        // Mock Prediction Function
+        function mockPrediction(inputs) {
+            // Base calculation
+            let totalRenewablePower = inputs.pvPower + inputs.windPower;
+            let efficiency = inputs.systemEfficiency / 100;
+
+            // Base production calculation
+            let base = (totalRenewablePower * 0.85) * efficiency * 0.8;
+
+            // Wind influence
+            base += (inputs.windSpeed * 0.5);
+
+            // Solar influence
+            base += (inputs.solarIrradiance * 2);
+
+            // Latitude band influence
+            const latitudeInfluence = {
+                'Equatorial': 1.1,
+                'Polar': 0.8,
+                'Subtropical': 1.05,
+                'Temperate': 1.0,
+                'Tropical': 1.08
+            };
+
+            base *= latitudeInfluence[inputs.latitudeBand] || 1.0;
+
+            // Add small random variation (±3%)
+            const variation = base * (0.97 + Math.random() * 0.06);
+
+            return Math.max(variation, 10);
+        }
+
+        // Real API Prediction Function
+        async function apiPrediction(inputs) {
+            try {
+                const response = await fetch(API_BASE_URL + '/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: parseFloat(inputs.latitude),
+                        longitude: parseFloat(inputs.longitude),
+                        solarIrradiance: parseFloat(inputs.solarIrradiance),
+                        windSpeed: parseFloat(inputs.windSpeed),
+                        pvPower: parseFloat(inputs.pvPower),
+                        windPower: parseFloat(inputs.windPower),
+                        systemEfficiency: parseFloat(inputs.systemEfficiency),
+                        latitudeBand: inputs.latitudeBand
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.prediction;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Main Prediction Function
+        async function makePrediction() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Predicting...';
+
+            const inputs = {
+                latitude: document.getElementById('latitude').value,
+                longitude: document.getElementById('longitude').value,
+                solarIrradiance: document.getElementById('solarIrradiance').value,
+                windSpeed: document.getElementById('windSpeed').value,
+                pvPower: document.getElementById('pvPower').value,
+                windPower: document.getElementById('windPower').value,
+                systemEfficiency: document.getElementById('systemEfficiency').value,
+                latitudeBand: document.getElementById('latitudeBand').value
+            };
+
+            // Validate inputs
+            if (!Object.values(inputs).every(v => v !== null && v !== '')) {
+                showError('Please fill all fields');
+                btn.disabled = false;
+                btn.textContent = '🚀 Predict Hydrogen Production';
+                return;
+            }
+
+            try {
+                let prediction;
+
+                if (USE_MOCK_PREDICTIONS) {
+                    prediction = mockPrediction(inputs);
+                } else {
+                    prediction = await apiPrediction(inputs);
+                }
+
+                // Display results
+                document.getElementById('predictionValue').textContent = prediction.toFixed(2);
+
+                // Update input summary
+                const summary = document.getElementById('inputSummary');
+                summary.innerHTML = `
+                    <div><strong>Latitude:</strong> ${inputs.latitude}°</div>
+                    <div><strong>Longitude:</strong> ${inputs.longitude}°</div>
+                    <div><strong>Solar Irradiance:</strong> ${inputs.solarIrradiance} kWh/m²/day</div>
+                    <div><strong>Wind Speed:</strong> ${inputs.windSpeed} m/s</div>
+                    <div><strong>PV Power:</strong> ${inputs.pvPower} kW</div>
+                    <div><strong>Wind Power:</strong> ${inputs.windPower} kW</div>
+                    <div><strong>System Efficiency:</strong> ${inputs.systemEfficiency}%</div>
+                    <div><strong>Latitude Band:</strong> ${inputs.latitudeBand}</div>
+                `;
+
+                document.getElementById('results').classList.add('show');
+                document.getElementById('error-message').innerHTML = '';
+
+                // Scroll to results
+                setTimeout(() => {
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            } catch (error) {
+                showError('Failed to make prediction. ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Predict Hydrogen Production';
+            }
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('latitude').value = 0;
+            document.getElementById('longitude').value = 0;
+            document.getElementById('solarIrradiance').value = 5.5;
+            document.getElementById('windSpeed').value = 7.5;
+            document.getElementById('pvPower').value = 250;
+            document.getElementById('windPower').value = 300;
+            document.getElementById('systemEfficiency').value = 75;
+            document.getElementById('latitudeBand').value = 'Temperate';
+
+            // Reset sliders
+            document.getElementById('solarSlider').value = 5.5;
+            document.getElementById('windSlider').value = 7.5;
+            document.getElementById('pvSlider').value = 250;
+            document.getElementById('windPowerSlider').value = 300;
+            document.getElementById('efficiencySlider').value = 75;
+
+            // Reset display values
+            document.getElementById('solarValue').textContent = '5.5';
+            document.getElementById('windValue').textContent = '7.5';
+            document.getElementById('pvValue').textContent = '250';
+            document.getElementById('windPowerValue').textContent = '300';
+            document.getElementById('efficiencyValue').textContent = '75';
+
+            document.getElementById('results').classList.remove('show');
+            document.getElementById('error-message').innerHTML = '';
+        }
+
+        // Error Display
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+        }
+
+        // Initialize sliders
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('GreenFuel-ML Application Loaded');
+            console.log('Using ' + (USE_MOCK_PREDICTIONS ? 'MOCK' : 'REAL') + ' predictions');
+        });
+    </script>
+</body>
+</html>
