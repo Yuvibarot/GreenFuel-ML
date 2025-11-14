@@ -1,6 +1,0 @@
-Initial commit: GreenFuel-ML Full Stack Application
-
-- Frontend: Professional web interface
-- Backend: Flask API with ML model
-- Deployment: AWS SAM, Docker, GitHub Pages
-- Features: Real-time predictions, Model info, Responsive design
