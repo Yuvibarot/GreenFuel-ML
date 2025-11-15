@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenFuel-ML: Hydrogen Production Predictor</title>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header" class="header">
+        <div class="container">
+            <h1>⚡ GreenFuel-ML</h1>
+            <p>Hydrogen Production Prediction using Machine Learning</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav id="nav" class="nav">
+        <div class="container">
+            <ul id="navLinks" class="nav-links">
+                <li><a href="#" data-page="dashboard" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" data-page="predictor" class="nav-link">Predictor</a></li>
+                <li><a href="#" data-page="modelinfo" class="nav-link">Model Info</a></li>
+                <li><a href="#" data-page="about" class="nav-link">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main" class="main">
+        <div class="container">
+
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="hero">
+                    <h2>Welcome to GreenFuel-ML</h2>
+                    <p>AI-powered predictions for renewable hydrogen production using PEM electrolyzers</p>
+                </div>
+
+                <div class="metrics-grid" id="metricsGrid">
+                    <!-- Metrics will be populated by JavaScript -->
+                </div>
+
+                <div class="info-card">
+                    <h3>📊 Project Overview</h3>
+                    <p>This machine learning model predicts hydrogen production rates from PEM (Proton Exchange Membrane) electrolyzers based on renewable energy inputs and system parameters.</p>
+                </div>
+            </div>
+
+            <!-- Predictor Page -->
+            <div id="predictor" class="page">
+                <h2>Hydrogen Production Predictor</h2>
+
+                <form id="predictionForm" class="prediction-form">
+                    <div id="errorMessage" class="error-container"></div>
+
+                    <div class="form-grid" id="formGrid">
+                        <!-- Form fields will be populated by JavaScript -->
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-predict">🚀 Predict Hydrogen Production</button>
+                        <button type="reset" class="btn-reset">↻ Reset</button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="results" class="results">
+                    <div class="prediction-result">
+                        <h3>Prediction Result</h3>
+                        <div id="predictionValue" class="prediction-value">0.00</div>
+                        <p>kg/day</p>
+
+                        <div class="confidence">
+                            <span>Model Confidence:</span>
+                            <div class="confidence-bar">
+                                <div id="confidenceFill" class="confidence-fill"></div>
+                            </div>
+                            <span id="confidenceValue">99.74%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-summary">
+                        <h4>Input Parameters Summary:</h4>
+                        <div id="inputSummary"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Info Page -->
+            <div id="modelinfo" class="page">
+                <h2>Model Information</h2>
+
+                <div class="model-info">
+                    <div class="info-card">
+                        <h3>📈 Performance Metrics</h3>
+                        <table id="metricsTable">
+                            <!-- Will be populated by JavaScript -->
+                        </table>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>📊 Dataset Information</h3>
+                        <table id="datasetTable">
+                            <!-- Will be populated by JavaScript -->
+                        </table>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin-top: 1.5rem;">
+                    <h3>🎯 Feature Importance</h3>
+                    <div id="featureImportance" class="feature-importance">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Page -->
+            <div id="about" class="page">
+                <div class="about-content">
+                    <h2>About GreenFuel-ML</h2>
+
+                    <h3>🌱 Project Overview</h3>
+                    <p>GreenFuel-ML is a machine learning project focused on modeling and optimizing PEM electrolyzer performance to improve hydrogen production efficiency through data-driven insights.</p>
+
+                    <h3>🎯 Objective</h3>
+                    <p>Build and evaluate multiple ML models to predict hydrogen production rates from renewable energy inputs, enabling better planning and optimization of green hydrogen production systems.</p>
+
+                    <h3>💡 Use Cases</h3>
+                    <p>
+                        • <strong>Production Planning:</strong> Predict daily hydrogen output for operational planning<br>
+                        • <strong>System Optimization:</strong> Identify optimal configurations for maximum efficiency<br>
+                        • <strong>Cost Analysis:</strong> Estimate production costs based on predicted yields<br>
+                        • <strong>Resource Allocation:</strong> Allocate renewable energy resources efficiently
+                    </p>
+
+                    <h3>🛠️ Technology Stack</h3>
+                    <p>
+                        • <strong>Frontend:</strong> HTML5, CSS3, Vanilla JavaScript<br>
+                        • <strong>Backend:</strong> Flask, Python<br>
+                        • <strong>ML:</strong> Scikit-learn, Gradient Boosting<br>
+                        • <strong>Build:</strong> Webpack, Babel<br>
+                        • <strong>Deployment:</strong> AWS Lambda, GitHub Pages
+                    </p>
+
+                    <h3>👨‍💻 Developer</h3>
+                    <p>
+                        <strong>Yuvraj Barot</strong><br>
+                        B.E. in Artificial Intelligence & Data Science<br>
+                        Apollo Institute of Engineering & Technology<br>
+                        <a href="https://github.com/Yuvibarot" target="_blank">GitHub Profile</a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <p>&copy; 2025 GreenFuel-ML - Hydrogen Production Prediction | Yuvraj Barot</p>
+    </footer>
+</body>
+</html>
