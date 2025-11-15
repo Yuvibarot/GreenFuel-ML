@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GreenFuel-ML: AI-powered predictions for renewable hydrogen production">
+    <title>⚡ GreenFuel-ML: Hydrogen Production Predictor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="spinner"></div>
+        <p>Loading GreenFuel-ML...</p>
+    </div>
+
+    <!-- Header -->
+    <header id="header" class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1 class="logo">⚡ GreenFuel-ML</h1>
+                    <p class="tagline">AI-Powered Hydrogen Production Prediction</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-value">99.74%</span>
+                        <span class="stat-label">Accuracy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav id="nav" class="nav">
+        <div class="container">
+            <ul id="navLinks" class="nav-links">
+                <li><a href="#" data-page="dashboard" class="nav-link active">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a></li>
+                <li><a href="#" data-page="predictor" class="nav-link">
+                    <span class="nav-icon">🚀</span> Predictor
+                </a></li>
+                <li><a href="#" data-page="modelinfo" class="nav-link">
+                    <span class="nav-icon">📈</span> Model Info
+                </a></li>
+                <li><a href="#" data-page="about" class="nav-link">
+                    <span class="nav-icon">ℹ️</span> About
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main" class="main">
+        <div class="container">
+
+            <!-- DASHBOARD PAGE -->
+            <div id="dashboard" class="page active">
+                <div class="hero">
+                    <div class="hero-content">
+                        <h2 class="hero-title">🌱 Welcome to GreenFuel-ML</h2>
+                        <p class="hero-subtitle">AI-powered predictions for renewable hydrogen production</p>
+                        <p class="hero-description">Using Gradient Boosting with 99.74% accuracy</p>
+                        <a href="#" data-page="predictor" class="hero-cta">Try Prediction Now →</a>
+                    </div>
+                </div>
+
+                <section class="metrics-section">
+                    <h3 class="section-title">📊 Model Performance</h3>
+                    <div class="metrics-grid" id="metricsGrid"></div>
+                </section>
+
+                <section class="stats-section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <h4>Training Data</h4>
+                            <p><strong>2,535</strong> samples</p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <h4>Target</h4>
+                            <p><strong>Hydrogen Output</strong></p>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚙️</div>
+                            <h4>Features</h4>
+                            <p><strong>8</strong> parameters</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="overview-section">
+                    <div class="info-card">
+                        <h3>🌍 About Project</h3>
+                        <p>Machine learning model for PEM electrolyzer hydrogen production prediction.</p>
+                        <div class="feature-list">
+                            <div class="feature-item">✓ Gradient Boosting with 99.74% R² Score</div>
+                            <div class="feature-item">✓ Real-time Prediction API</div>
+                            <div class="feature-item">✓ Interactive Web Interface</div>
+                            <div class="feature-item">✓ Production-Ready Deployment</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PREDICTOR PAGE -->
+            <div id="predictor" class="page">
+                <h2 class="page-title">🚀 Hydrogen Production Predictor</h2>
+
+                <form id="predictionForm" class="prediction-form">
+                    <div id="errorMessage" class="error-container"></div>
+
+                    <div class="form-header">
+                        <h3>Configure System Parameters</h3>
+                        <p class="form-description">Adjust values to see hydrogen production predictions</p>
+                    </div>
+
+                    <div class="form-grid" id="formGrid"></div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-predict">🚀 Predict Production</button>
+                        <button type="reset" class="btn-reset">↻ Reset Form</button>
+                    </div>
+                </form>
+
+                <div id="results" class="results">
+                    <div class="results-header">
+                        <h3>✅ Prediction Result</h3>
+                    </div>
+                    <div class="prediction-result">
+                        <div class="prediction-display">
+                            <div class="prediction-value" id="predictionValue">0.00</div>
+                            <div class="prediction-unit">kg/day</div>
+                        </div>
+                        <div class="confidence-section">
+                            <span class="gauge-label">Model Confidence:</span>
+                            <div class="confidence-bar">
+                                <div id="confidenceFill" class="confidence-fill"></div>
+                            </div>
+                            <span id="confidenceValue" class="gauge-value">99.74%</span>
+                        </div>
+                    </div>
+                    <div class="input-summary">
+                        <h4>📋 Input Parameters</h4>
+                        <div id="inputSummary" class="summary-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODEL INFO PAGE -->
+            <div id="modelinfo" class="page">
+                <h2 class="page-title">📈 Model Information</h2>
+
+                <section class="model-section">
+                    <h3>🏆 Performance Metrics</h3>
+                    <div class="metrics-table-container">
+                        <table id="metricsTable" class="data-table"></table>
+                    </div>
+                </section>
+
+                <section class="model-section">
+                    <h3>📊 Dataset</h3>
+                    <table id="datasetTable" class="data-table"></table>
+                </section>
+
+                <section class="model-section">
+                    <h3>🎯 Feature Importance</h3>
+                    <div id="featureImportance" class="feature-importance"></div>
+                </section>
+            </div>
+
+            <!-- ABOUT PAGE -->
+            <div id="about" class="page">
+                <div class="about-content">
+                    <h2>About GreenFuel-ML</h2>
+                    <section class="about-section">
+                        <h3>🌱 Project Overview</h3>
+                        <p>Machine learning project for modeling and optimizing PEM electrolyzer performance.</p>
+                    </section>
+                    <section class="about-section">
+                        <h3>🎯 Objectives</h3>
+                        <ul class="objectives-list">
+                            <li>Build accurate ML models for hydrogen production prediction</li>
+                            <li>Optimize system parameters for maximum efficiency</li>
+                            <li>Provide actionable insights for production planning</li>
+                        </ul>
+                    </section>
+                    <section class="about-section">
+                        <h3>👨‍💻 Developer</h3>
+                        <p><strong>Yuvraj Barot</strong></p>
+                        <p>B.E. in AI & Data Science</p>
+                        <p><a href="https://github.com/Yuvibarot" target="_blank">🐙 GitHub</a></p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <p>&copy; 2025 GreenFuel-ML | Made with ❤️ for Renewable Energy</p>
+        </div>
+    </footer>
+
+    <!-- Scripts - FIXED PATHS -->
+    <script src="app.js"></script>
+</body>
+</html>
