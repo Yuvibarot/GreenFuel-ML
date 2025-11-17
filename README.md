@@ -13,13 +13,13 @@ Hydrogen-Energy-ML-Project/
 │   │   ├──optimal_operating_conditions.csv
 │   │   ├──Optimization Results.csv
 │   │   ├──optimization_grid_search_results.csv
-│   ├── Processed
+│   ├── Processed/
 │   │   ├──correlation_matrix.csv
 │   │   ├──feature_importance_efficiency.csv
 │   │   ├──feature_importance_voltage.csv
 │   │   ├──model_predictions_test_set.csv
 │   │   ├──validation_results_detailed.csv
-│   ├── Raw
+│   ├── Raw/
 │   │   ├── PEM_Data_Engineered_Features.csv
 │
 │── week 1 task/
