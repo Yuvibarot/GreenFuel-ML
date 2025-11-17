@@ -1,0 +1,2 @@
+Operating_Temperature_C,Current_Density_mA_cm2,Cathode_Pressure_bar,Anode_Pressure_bar,Anode_Catalyst_Loading_mg_cm2,Cathode_Catalyst_Loading_mg_cm2,Membrane_Thickness_um,Membrane_Water_Content_lambda,Anode_Catalyst_Type,Membrane_Type,Predicted_Voltage_V,Predicted_Efficiency_percent,Predicted_H2_mL_min
+60.0,800.0,25,2,1.2,0.08,50,22,IrO2,Nafion_212,1.5632999999999992,94.67984999999992,139.296
